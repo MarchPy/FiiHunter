@@ -39,11 +39,13 @@ class FundsExplorer:
 
     def fundamentus(self) -> pd.DataFrame:
         df_fundamentus = pd.DataFrame()
+        symbols = self.__settings['fundos']
 
+        idx = 1
         with requests_cache.enabled('config/cache.db'):
-            for symbol in self.__settings['fundos']:
+            for symbol in symbols:
                 symbol = symbol.upper()
-                self.__console.print(f'[{self.__time()}] -> [[italic yellow]Coletando dados fundamentalistas para o ativo[/]] :: {symbol} -> ', end='')
+                self.__console.print(f'[{self.__time()}] -> [[italic yellow]Coletando dados fundamentalistas para o ativo[/]]-[{idx} de {len(symbols)}] :: {symbol} -> ', end='')
 
                 url = f"http://fundamentus.com.br/detalhes.php?papel={symbol}"
 
@@ -75,6 +77,8 @@ class FundsExplorer:
                 except (ValueError, IndexError):
                     self.__console.print('[[red]Não foi possível coletar os dados fundamentalistas[/]]')
 
+                idx += 1
+                
         columns_to_drop = [
             np.nan, 'Cart. de Crédito', 'Depósitos', 'Nro. Ações', 'Últ balanço processado', 'Data últ cot', 'Balanço Patrimonial',
             'Últimos 3 meses', 'Balanço Patrimonial', 'Últimos 12 meses', 'Receita', 'FFO','Resultado', 'Últ Info Trimestral', 'Relatório',
