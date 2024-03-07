@@ -9,7 +9,7 @@ from datetime import datetime
 from rich.console import Console
 
 
-class FundExplorer:
+class FundsExplorer:
     def __init__(self) -> None:
         self.__console = Console()
         self.__header = {
