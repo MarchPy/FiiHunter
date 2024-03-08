@@ -1,5 +1,5 @@
 rich==13.06.0
 numpy==1.26.4
 pandas==2.1.1
-requests==2.21.0
+requests==2.31.0
 requests_cache==1.1.1

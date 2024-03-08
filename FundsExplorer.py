@@ -29,12 +29,14 @@ class FundsExplorer:
                 return settings
 
         except FileNotFoundError:
-            self.__console.print(f'[] -> [[italic red]Arquivo settings.json não foi encontrado.[/]]')
+            self.__console.print(f'[{self.__time()}] -> [[italic red]Arquivo settings.json não foi encontrado.[/]]')
 
-    def __time(self):
+    @staticmethod
+    def __time():
         return datetime.now().strftime(format='%H:%M:%S')
 
-    def __date(self):
+    @staticmethod
+    def __date():
         return datetime.now().strftime(format='%d-%m-%Y')
 
     def fundamentus(self) -> pd.DataFrame:
@@ -81,7 +83,7 @@ class FundsExplorer:
                 
         columns_to_drop = [
             np.nan, 'Cart. de Crédito', 'Depósitos', 'Nro. Ações', 'Últ balanço processado', 'Data últ cot', 'Balanço Patrimonial',
-            'Últimos 3 meses', 'Balanço Patrimonial', 'Últimos 12 meses', 'Receita', 'FFO','Resultado', 'Últ Info Trimestral', 'Relatório',
+            'Últimos 3 meses', 'Balanço Patrimonial', 'Últimos 12 meses', 'Receita', 'FFO', 'Resultado', 'Últ Info Trimestral', 'Relatório',
             'Mandato', 'Gestão', 'Venda de ativos', 'Rend. Distribuído'
         ]
         columns_to_int = [
