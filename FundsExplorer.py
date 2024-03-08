@@ -158,5 +158,6 @@ class FundsExplorer:
         self.__console.print(f'\n\n[[bold yellow]Resultado salvo em excel[/]] -> ({os.path.join(folder, filename)})')
 
     def display_result(self, dataframe: pd.DataFrame) -> None:
+        print(dataframe.columns)
         self.__console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido:[/]]')
         self.__console.print(dataframe[['FII', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd imóveis', 'Qtd Unidades', 'Vacância Média']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
