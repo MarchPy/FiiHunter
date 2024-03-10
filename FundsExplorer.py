@@ -157,7 +157,20 @@ class FundsExplorer:
         dataframe.to_excel(excel_writer=os.path.join(folder, filename), index=False)
         self.__console.print(f'\n\n[[bold yellow]Resultado salvo em excel[/]] -> ({os.path.join(folder, filename)})')
 
+    def ranking(self, dataframe: pd.DataFrame):
+        dataframe = dataframe.copy()
+        dataframe['Ranking'] = 0
+        for column in self.__settings['ranking']:
+            if self.__settings['ranking'][column] == "Max":
+                index = dataframe[(dataframe[column] == dataframe[column].max())].index.values
+                dataframe.loc[index[0], 'Ranking'] += 1 if len(index) == 1 else 0
+
+            elif self.__settings['ranking'][column] == "Min":
+                index = dataframe[(dataframe[column] == dataframe[column].min())].index.values
+                dataframe.loc[index[0], 'Ranking'] += 1 if len(index) == 1 else 0
+
+        return dataframe.sort_values(by='Ranking', ascending=False)
+
     def display_result(self, dataframe: pd.DataFrame) -> None:
-        print(dataframe.columns)
-        self.__console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido:[/]]')
-        self.__console.print(dataframe[['FII', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd imóveis', 'Qtd Unidades', 'Vacância Média']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
+        self.__console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
+        self.__console.print(dataframe[['FII', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd imóveis', 'Qtd Unidades', 'Vacância Média', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
