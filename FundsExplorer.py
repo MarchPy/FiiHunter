@@ -172,5 +172,7 @@ class FundsExplorer:
         return dataframe.sort_values(by='Ranking', ascending=False)
 
     def display_result(self, dataframe: pd.DataFrame) -> None:
+        os.system(command='cls' if os.name == 'nt' else 'clear')
+        
         self.__console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
         self.__console.print(dataframe[['FII', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd imóveis', 'Qtd Unidades', 'Vacância Média', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
