@@ -4,6 +4,7 @@ import requests
 import numpy as np
 import pandas as pd
 import requests_cache
+from time import sleep
 from io import StringIO
 from datetime import datetime
 from rich.console import Console
@@ -176,3 +177,5 @@ class FundsExplorer:
         
         self.__console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
         self.__console.print(dataframe[['FII', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd imóveis', 'Qtd Unidades', 'Vacância Média', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
+
+        self.__console.input('[bold yellow]Precione qualquer tecla para encerrar o programa. [/]')
