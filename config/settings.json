@@ -57,9 +57,10 @@
     "YUFI11", "ZAVI11", "ZIFI11", "FLEM11", "FZDB11", "FZDA11", "AAGR11", "AAZQ11", "BBGO11",
     "AMAZ11", "CPTR11", "DCRA11", "EGAF11", "AGRX11", "RZAG11", "JGPX11", "FGAA11", "GCRA11",
     "GRWA11", "HGAG11", "IAAG11", "RURA11", "KNCA11", "KOPA11", "LSAG11", "NCRA11", "OIAG11",
-    "PLCA11", "RZEO11", "IAGR11", "CRAA11", "SNAG11", "VGIA11", "VCRA11", "XPCA11"
+    "PLCA11", "RZEO11", "IAGR11", "CRAA11", "SNAG11", "VGIA11", "VCRA11", "XPCA11", "SNME11",
+    "SNID11", "SNCI11", "SNEL11", "SNFF11", "SNLG11", "CAFE11"
   ],
-  
+
   "filtro": {
     "Dividend yield (Min)": 12,
     "Volume médio 2m (Min)": 200000,
