@@ -12,7 +12,7 @@ from rich.console import Console
 
 class FundsExplorer:
     def __init__(self) -> None:
-        self.__console = Console()
+        self._console = Console()
         self.__header = {
             "Host": "fundamentus.com.br",
             "Sec-Ch-Ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
@@ -30,7 +30,7 @@ class FundsExplorer:
                 return settings
 
         except FileNotFoundError:
-            self.__console.print(f'[{self.__time()}] -> [[italic red]Arquivo settings.json não foi encontrado.[/]]')
+            self._console.print(f'[{self.__time()}] -> [[italic red]Arquivo settings.json não foi encontrado.[/]]')
 
     @staticmethod
     def __time():
@@ -48,7 +48,7 @@ class FundsExplorer:
         with requests_cache.enabled('config/cache.db'):
             for symbol in symbols:
                 symbol = symbol.upper()
-                self.__console.print(f'[{self.__time()}] -> [[italic yellow]Coletando dados fundamentalistas para o ativo[/]]-[{idx} de {len(symbols)}] :: {symbol} -> ', end='')
+                self._console.print(f'[{self.__time()}] -> [[italic yellow]Coletando dados fundamentalistas para o ativo[/]]-[{idx} de {len(symbols)}] :: {symbol} -> ', end='')
 
                 url = f"http://fundamentus.com.br/detalhes.php?papel={symbol}"
 
@@ -75,10 +75,10 @@ class FundsExplorer:
                     line = df_final[1:]
                     if not line.empty:
                         df_fundamentus = pd.concat([df_fundamentus, line])
-                        self.__console.print('[[green]Dados fundamentalistas coletados[/]]')
+                        self._console.print('[[green]Dados fundamentalistas coletados[/]]')
 
                 except (ValueError, IndexError):
-                    self.__console.print('[[red]Não foi possível coletar os dados fundamentalistas[/]]')
+                    self._console.print('[[red]Não foi possível coletar os dados fundamentalistas[/]]')
 
                 idx += 1
                 
@@ -156,7 +156,7 @@ class FundsExplorer:
 
         filename = f"Resultado dos fundos imobiliários ({self.__date()}).xlsx"
         dataframe.to_excel(excel_writer=os.path.join(folder, filename), index=False)
-        self.__console.print(f'\n\n[[bold yellow]Resultado salvo em excel[/]] -> ({os.path.join(folder, filename)})')
+        self._console.print(f'\n\n[[bold yellow]Resultado salvo em excel[/]] -> ({os.path.join(folder, filename)})')
 
     def ranking(self, dataframe: pd.DataFrame):
         dataframe = dataframe.copy()
@@ -175,7 +175,6 @@ class FundsExplorer:
     def display_result(self, dataframe: pd.DataFrame) -> None:
         os.system(command='cls' if os.name == 'nt' else 'clear')
         
-        self.__console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
-        self.__console.print(dataframe[['FII', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd imóveis', 'Qtd Unidades', 'Vacância Média', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
+        self._console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
+        self._console.print(dataframe[['FII', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd imóveis', 'Qtd Unidades', 'Vacância Média', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
 
-        self.__console.input('[bold yellow]Precione qualquer tecla para encerrar o programa. [/]')

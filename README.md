@@ -11,10 +11,8 @@ Para usar este script, siga estas etapas:
 3. Execute o script executando-o em seu ambiente Python
 
    ```bash
-   python3 main.py -s 
+   python3 run.py -s 
    ```
-
-   .
 
 ## Saída:
 

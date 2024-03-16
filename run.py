@@ -11,5 +11,8 @@ def main():
     if "-s" in argv:
         app.save_file(dataframe=df_ranking)
 
+    app._console.input('[bold yellow]Precione qualquer tecla para encerrar o programa. [/]')
+    
+
 
 main()
