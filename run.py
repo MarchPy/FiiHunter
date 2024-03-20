@@ -1,9 +1,9 @@
 from sys import argv
-from FundsExplorer import FundsExplorer
+from FiiHunter  import FiiHunter 
 
 
 def main():
-    app = FundsExplorer()
+    app = FiiHunter()
     df_fundamentus = app.fundamentus()
     df_filtered = app.filter(dataframe=df_fundamentus)
     df_ranking = app.ranking(dataframe=df_filtered)
@@ -13,6 +13,5 @@ def main():
 
     app._console.input('[bold yellow]Precione qualquer tecla para encerrar o programa. [/]')
     
-
 
 main()

@@ -66,15 +66,14 @@
     "Volume médio 2m (Min)": 200000,
     "Quantidade de imóveis (Min)": 1,
     "P/VP (Min)": 0,
-    "P/VP (Max)": 1,
+    "P/VP (Max)": 1.1,
     "VP/Cota > Preço cota": true,
-    "Vacância média (Max)": 10.0
+    "Vacância média (Max)": 5.0
   },
 
   "ranking": {
     "Vol $ méd (2m)": "Max",
     "Valor de mercado": "Max",
-    "Nro. Cotas": "",
     "FFO Yield": "Max",
     "Div. Yield": "Max",
     "P/VP": "Min",
@@ -85,10 +84,14 @@
     "Qtd imóveis": "Max",
     "Qtd Unidades": "Max",
     "Imóveis/PL do FII": "",
-    "Área (m2)": "Max",
+    "Área (m2)": "",
     "Aluguel/m2": "",
     "Preço do m2": "",
     "Cap Rate": "Max",
-    "Vacância Média": "Min"
+    "Vacância Média": "Min",
+    "Dia": "",
+    "Mês": "",
+    "30 dias": "",
+    "12 meses": ""
   }
 }

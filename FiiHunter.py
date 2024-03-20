@@ -4,13 +4,12 @@ import requests
 import numpy as np
 import pandas as pd
 import requests_cache
-from time import sleep
 from io import StringIO
 from datetime import datetime
 from rich.console import Console
 
 
-class FundsExplorer:
+class FiiHunter:
     def __init__(self) -> None:
         self._console = Console()
         self.__header = {
@@ -23,7 +22,7 @@ class FundsExplorer:
         }
         self.__settings = self.__open_settings()
 
-    def __open_settings(self):
+    def __open_settings(self) -> dict:
         try:
             with open(file='config/settings.json', mode='r', encoding='utf-8') as fileObj:
                 settings = json.load(fp=fileObj)
@@ -33,11 +32,11 @@ class FundsExplorer:
             self._console.print(f'[{self.__time()}] -> [[italic red]Arquivo settings.json não foi encontrado.[/]]')
 
     @staticmethod
-    def __time():
+    def __time() -> str:
         return datetime.now().strftime(format='%H:%M:%S')
 
     @staticmethod
-    def __date():
+    def __date() -> str:
         return datetime.now().strftime(format='%d-%m-%Y')
 
     def fundamentus(self) -> pd.DataFrame:
@@ -61,18 +60,21 @@ class FundsExplorer:
                     df_2 = tables_html[2]
                     df_3 = tables_html[3]
                     df_4 = tables_html[4]
-
+                  
                     df_final = pd.concat(objs=[
                             pd.concat(objs=[pd.concat([df_0[0], df_0[2]]), pd.concat([df_0[1], df_0[3]])], axis=1).T,
                             pd.concat(objs=[pd.concat([df_1[0], df_1[2]]), pd.concat([df_1[1], df_1[3]])], axis=1).T,
                             pd.concat(objs=[pd.concat([df_2[2], df_2[4]]), pd.concat([df_2[3], df_2[5]])], axis=1).T.drop(columns=0),
                             pd.concat(objs=[pd.concat([df_3[0], df_3[2]]), pd.concat([df_3[1], df_3[3]])], axis=1).T.drop(columns=0),
-                            pd.concat(objs=[pd.concat([df_4[0], df_4[2], df_4[4]]), pd.concat([df_4[1], df_4[3], df_4[5]])], axis=1).T.drop(columns=0)
+                            pd.concat(objs=[pd.concat([df_4[0], df_4[2], df_4[4]]), pd.concat([df_4[1], df_4[3], df_4[5]])], axis=1).T.drop(columns=0),
+                            pd.concat(objs=[df_2[0], df_2[1]], axis=1).T.drop(columns=0)[[1, 2, 3, 4]]
+
                         ], axis=1)
 
                     df_final.columns = df_final.iloc[0].str.replace(pat='?', repl='')
 
-                    line = df_final[1:]
+                    line = df_final[1:2]
+
                     if not line.empty:
                         df_fundamentus = pd.concat([df_fundamentus, line])
                         self._console.print('[[green]Dados fundamentalistas coletados[/]]')
@@ -83,8 +85,7 @@ class FundsExplorer:
                 idx += 1
                 
         columns_to_drop = [
-            np.nan, 'Cart. de Crédito', 'Depósitos', 'Nro. Ações', 'Últ balanço processado', 'Data últ cot', 'Balanço Patrimonial',
-            'Últimos 3 meses', 'Balanço Patrimonial', 'Últimos 12 meses', 'Receita', 'FFO', 'Resultado', 'Últ Info Trimestral', 'Relatório',
+            np.nan, 'Data últ cot', 'Balanço Patrimonial', 'Últimos 3 meses', 'Balanço Patrimonial', 'Últimos 12 meses', 'Receita', 'FFO', 'Resultado', 'Últ Info Trimestral', 'Relatório',
             'Mandato', 'Gestão', 'Venda de ativos', 'Rend. Distribuído'
         ]
         columns_to_int = [
@@ -96,7 +97,7 @@ class FundsExplorer:
             'FFO/Cota'
         ]
         columns_to_format_float = [
-            'FFO Yield', 'Vacância Média', 'Cap Rate', 'Imóveis/PL do FII', 'Div. Yield'
+            'FFO Yield', 'Vacância Média', 'Cap Rate', 'Imóveis/PL do FII', 'Div. Yield', 'Dia', 'Mês', '30 dias', '12 meses'
         ]
 
         df_fundamentus = df_fundamentus.replace(to_replace=r'^-$', value='0', regex=True)
@@ -125,23 +126,22 @@ class FundsExplorer:
 
         for to_format_float in columns_to_format_float:
             try:
-                df_fundamentus[to_format_float] = df_fundamentus[to_format_float].str.replace(pat='.', repl='').str.replace(pat=',', repl='.').str.replace(pat='%', repl='').astype(float)
+                df_fundamentus[to_format_float] = df_fundamentus[to_format_float].astype(str).str.replace(pat='.', repl='').str.replace(pat=',', repl='.').str.replace(pat='%', repl='').astype(float)
 
             except KeyError:
                 pass
 
-        df_fundamentus = df_fundamentus.reset_index(drop=True)
-        return df_fundamentus
+        return df_fundamentus.reset_index(drop=True)
 
     def filter(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         filter_ = (
             (dataframe['Div. Yield'] >= self.__settings['filtro']['Dividend yield (Min)']) &
-            (dataframe['Vol $ méd (2m)'] >= self.__settings['filtro']['Volume médio 2m (Min)']) &
+            (dataframe['Vol $ méd (2m)'] > self.__settings['filtro']['Volume médio 2m (Min)']) &
             (dataframe['Qtd imóveis'] >= self.__settings['filtro']['Quantidade de imóveis (Min)']) &
-            (dataframe['P/VP'] <= self.__settings['filtro']['P/VP (Max)']) &
-            (dataframe['P/VP'] >= self.__settings['filtro']['P/VP (Min)']) &
+            (dataframe['P/VP'] < self.__settings['filtro']['P/VP (Max)']) &
+            (dataframe['P/VP'] > self.__settings['filtro']['P/VP (Min)']) &
             (dataframe['VP/Cota'] > dataframe['Cotação'] if self.__settings['filtro']['VP/Cota > Preço cota'] else None) &
-            (dataframe['Vacância Média'] <= self.__settings['filtro']['Vacância média (Max)'])
+            (dataframe['Vacância Média'] < self.__settings['filtro']['Vacância média (Max)'])
         )
 
         return dataframe[filter_]
@@ -156,9 +156,9 @@ class FundsExplorer:
 
         filename = f"Resultado dos fundos imobiliários ({self.__date()}).xlsx"
         dataframe.to_excel(excel_writer=os.path.join(folder, filename), index=False)
-        self._console.print(f'\n\n[[bold yellow]Resultado salvo em excel[/]] -> ({os.path.join(folder, filename)})')
+        self._console.print(f'[[bold yellow]Resultado salvo em excel[/]] -> ({os.path.join(folder, filename)})')
 
-    def ranking(self, dataframe: pd.DataFrame):
+    def ranking(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         dataframe = dataframe.copy()
         dataframe['Ranking'] = 0
         for column in self.__settings['ranking']:
@@ -177,4 +177,3 @@ class FundsExplorer:
         
         self._console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
         self._console.print(dataframe[['FII', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd imóveis', 'Qtd Unidades', 'Vacância Média', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
-
