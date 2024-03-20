@@ -1,4 +1,4 @@
-## _FundsExplporer_ - Introdução ao programa
+## _FiiHunter_ - Introdução ao programa
 
 Este script coleta e analisa dados de ativos financeiros, mais especificamente fundos de investimento imobiliário (FIIs) no Brasil. Ele extrai informações do site 'fundamentus.com.br' e, em seguida, processa e filtra os dados para análises posteriores. Aqui está uma visão geral do código e de suas funcionalidades:
 
