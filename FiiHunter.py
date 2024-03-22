@@ -42,7 +42,7 @@ class FiiHunter:
     def fundamentus(self) -> pd.DataFrame:
         data = []
         dataNotFound = []
-        symbols = self.__settings['fundos']
+        symbols = self.__settings['funds']
 
         idx = 1
         with requests_cache.enabled('config/cache.db'):
@@ -151,19 +151,19 @@ class FiiHunter:
 
     def filter(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         filter_ = (
-            (dataframe['Div. Yield'] >= self.__settings['filtro']['Dividend yield (Min)']) &
-            (dataframe['Vol $ méd (2m)'] > self.__settings['filtro']['Volume médio 2m (Min)']) &
-            (dataframe['Qtd. Imóveis'] >= self.__settings['filtro']['Quantidade de imóveis (Min)']) &
-            (dataframe['P/VP'] < self.__settings['filtro']['P/VP (Max)']) &
-            (dataframe['P/VP'] > self.__settings['filtro']['P/VP (Min)']) &
-            (dataframe['VP/Cota'] > dataframe['Cotação'] if self.__settings['filtro']['VP/Cota > Preço cota'] else None) &
-            (dataframe['Vacância média'] < self.__settings['filtro']['Vacância média (Max)'])
+            (dataframe['Div. Yield'] >= self.__settings['filter']['Dividend yield (Min)']) &
+            (dataframe['Vol $ méd (2m)'] > self.__settings['filter']['Volume médio 2m (Min)']) &
+            (dataframe['Qtd. Imóveis'] >= self.__settings['filter']['Quantidade de imóveis (Min)']) &
+            (dataframe['P/VP'] < self.__settings['filter']['P/VP (Max)']) &
+            (dataframe['P/VP'] > self.__settings['filter']['P/VP (Min)']) &
+            (dataframe['VP/Cota'] > dataframe['Cotação'] if self.__settings['filter']['VP/Cota > Preço cota'] else None) &
+            (dataframe['Vacância média'] < self.__settings['filter']['Vacância média (Max)'])
         )
 
         return dataframe[filter_]
 
     def save_file(self, dataframe: pd.DataFrame) -> None:
-        folder = self.__settings['pasta']
+        folder = self.__settings['diretorioResultado']
         try:
             os.mkdir(path=folder)
 

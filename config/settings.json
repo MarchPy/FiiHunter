@@ -1,7 +1,7 @@
 {
-  "pasta" : "resultados/",
+  "diretorioResultado" : "resultados/",
 
-  "fundos": [
+  "funds": [
     "ABCP11", "AFHI11", "AIEC11", "ALMI11", "ALZC11", "ALZM11", "ALZR11", "ANCR11B", "APTO11",
     "APXM11", "AQLL11", "ARFI11B", "AROA11", "ARRI11", "ARXD11", "ASMT11", "ASRF11", "ATCR11",
     "ATSA11", "ATWN11", "AURB11", "BARI11", "BBFI11B", "BBFO11", "BBIM11", "BBPO11", "BBRC11",
@@ -61,7 +61,7 @@
     "SNID11", "SNCI11", "SNEL11", "SNFF11", "SNLG11", "CAFE11"
   ],
 
-  "filtro": {
+  "filter": {
     "Dividend yield (Min)": 12,
     "Volume médio 2m (Min)": 200000,
     "Quantidade de imóveis (Min)": 1,
