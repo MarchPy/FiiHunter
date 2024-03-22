@@ -73,25 +73,19 @@
 
   "ranking": {
     "Vol $ méd (2m)": "Max",
-    "Valor de mercado": "Max",
     "FFO Yield": "Max",
     "Div. Yield": "Max",
     "P/VP": "Min",
     "Ativos": "Max",
     "FFO/Cota": "Max",
     "Dividendo/cota": "Max",
-    "Patrim Líquido": "Max",
-    "Qtd imóveis": "Max",
-    "Qtd Unidades": "Max",
-    "Imóveis/PL do FII": "",
+    "Patrim. Líquido": "Max",
+    "Qtd. Imóveis": "Max",
+    "Qtd. Unidades": "Max",
     "Área (m2)": "",
     "Aluguel/m2": "",
     "Preço do m2": "",
     "Cap Rate": "Max",
-    "Vacância Média": "Min",
-    "Dia": "",
-    "Mês": "",
-    "30 dias": "",
-    "12 meses": ""
+    "Vacância média": "Min"
   }
 }
