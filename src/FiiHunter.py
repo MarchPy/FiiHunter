@@ -114,7 +114,8 @@ class FiiHunter:
                         capRate = float(capRate.replace('.', '').replace(',', '.').replace('%', '')) if capRate != '-' else 0
                         vacMedia = tables[4].find_all(name='td', attrs={'class', 'data'})[5].text
                         vacMedia = float(vacMedia.replace('%', '').replace(',', '.')) if vacMedia != '-' else 0
-                        precoM2 = int(tables[4].find_all(name='td', attrs={'class', 'data'})[7].text.replace('.', ''))
+                        precoM2 = tables[4].find_all(name='td', attrs={'class', 'data'})[7].text
+                        precoM2 = int(precoM2.replace('.', '')) if precoM2 != '-' else 0
 
                         data.append(
                             [
