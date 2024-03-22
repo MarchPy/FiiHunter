@@ -1,12 +1,13 @@
 import os
 import json
 import requests
+import numpy as np
 import pandas as pd
 import requests_cache
-from datetime import datetime
 from bs4 import BeautifulSoup
+from src.YfScraper import YfScraper
 from rich.console import Console
-
+from datetime import datetime, timedelta
 
 
 class FiiHunter:
@@ -110,6 +111,7 @@ class FiiHunter:
                         qtdUnidades = int(qtdUnidades) if qtdUnidades != '' else 0
                         areaM2 = tables[4].find_all(name='td', attrs={'class', 'data'})[1].text
                         capRate = tables[4].find_all(name='td', attrs={'class', 'data'})[2].text
+                        capRate = float(capRate.replace('.', '').replace(',', '.').replace('%', '')) if capRate != '-' else 0
                         vacMedia = tables[4].find_all(name='td', attrs={'class', 'data'})[5].text
                         vacMedia = float(vacMedia.replace('%', '').replace(',', '.')) if vacMedia != '-' else 0
                         precoM2 = tables[4].find_all(name='td', attrs={'class', 'data'})[7].text
@@ -148,6 +150,30 @@ class FiiHunter:
         ]
         dfFundamentus = pd.DataFrame(data=data, columns=columns)
         return dfFundamentus
+
+    def technicalIndicators(self, dataframe: pd.DataFrame):
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365)
+        end_date = end_date.strftime(format='%Y-%m-%d')
+        start_date = start_date.strftime(format='%Y-%m-%d')
+
+        dataframe = dataframe.copy()
+        dataframe['Volat. Anualizada'] = 0.0
+        for index, row in dataframe.iterrows():
+            symbol = row['Ativo']
+            df_yf = YfScraper(symbol=symbol, start_date=start_date, end_date=end_date, interval='1d').collect_data()
+            if not df_yf.empty:
+                df_yf['Retorno Diario'] = df_yf['Close'].ffill().pct_change()
+
+                desvio_padrao = df_yf['Retorno Diario'].std()
+                volatilidade_anual = (desvio_padrao * np.sqrt(252)) * 100
+
+                dataframe.loc[index, 'Volat. Anualizada'] = float(f'{volatilidade_anual:.2f}')
+            
+            else:
+                dataframe.loc[index, 'Volat. Anualizada'] = 0
+
+        return dataframe
 
     def filter(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         filter_ = (
@@ -190,4 +216,4 @@ class FiiHunter:
 
     def displayResult(self, dataframe: pd.DataFrame) -> None:
         self._console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
-        self._console.print(dataframe[['Ativo', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd. Imóveis', 'Qtd. Unidades', 'Vacância média', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
+        self._console.print(dataframe[['Ativo', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd. Imóveis', 'Qtd. Unidades', 'Vacância média', 'Volat. Anualizada', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
