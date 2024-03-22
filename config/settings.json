@@ -64,7 +64,7 @@
   "filter": {
     "Dividend yield (Min)": 12,
     "Volume médio 2m (Min)": 200000,
-    "Quantidade de imóveis (Min)": 0,
+    "Quantidade de imóveis (Min)": 1,
     "P/VP (Min)": 0,
     "P/VP (Max)": 1.1,
     "VP/Cota > Preço cota": true,

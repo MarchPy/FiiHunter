@@ -86,7 +86,7 @@ class FiiHunter:
                         volumeMedio2m = int(tables[0].find_all(name='td', attrs={'class': 'data'})[9].text.replace('.', ''))
 
                         # Tabela 1
-                        nTotalCotas = tables[1].find_all(name='td', attrs={'class': 'data'})[1].text
+                        nTotalCotas = int(tables[1].find_all(name='td', attrs={'class': 'data'})[1].text.replace('.', ''))
                         relatorio = tables[1].find_all(name='td', attrs={'class': 'data'})[2].find(name='a')
                         relatorio = relatorio['href'] if relatorio is not None else "-"
 
@@ -109,12 +109,12 @@ class FiiHunter:
                         qtdImoveis = int(tables[4].find_all(name='td', attrs={'class', 'data'})[0].text)
                         qtdUnidades = tables[4].find_all(name='td', attrs={'class', 'data'})[3].text
                         qtdUnidades = int(qtdUnidades) if qtdUnidades != '' else 0
-                        areaM2 = tables[4].find_all(name='td', attrs={'class', 'data'})[1].text
+                        areaM2 = int(tables[4].find_all(name='td', attrs={'class', 'data'})[1].text.replace('.', ''))
                         capRate = tables[4].find_all(name='td', attrs={'class', 'data'})[2].text
                         capRate = float(capRate.replace('.', '').replace(',', '.').replace('%', '')) if capRate != '-' else 0
                         vacMedia = tables[4].find_all(name='td', attrs={'class', 'data'})[5].text
                         vacMedia = float(vacMedia.replace('%', '').replace(',', '.')) if vacMedia != '-' else 0
-                        precoM2 = tables[4].find_all(name='td', attrs={'class', 'data'})[7].text
+                        precoM2 = int(tables[4].find_all(name='td', attrs={'class', 'data'})[7].text.replace('.', ''))
 
                         data.append(
                             [
