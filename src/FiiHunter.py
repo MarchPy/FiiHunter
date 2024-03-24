@@ -4,6 +4,7 @@ import requests
 import numpy as np
 import pandas as pd
 import requests_cache
+from time import sleep
 from bs4 import BeautifulSoup
 from src.YfScraper import YfScraper
 from rich.console import Console
@@ -12,6 +13,9 @@ from datetime import datetime, timedelta
 
 class FiiHunter:
     def __init__(self) -> None:
+        self.version = "1.0.0"
+        self.author = "MarchPy"
+        self.github = "https://github.com/MarchPy/FiiHunter"
         self._console = Console()
         self.__headers = {
             "Host": "fundamentus.com.br",
@@ -22,6 +26,22 @@ class FiiHunter:
             "Accept-Language": "en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7"
         }
         self.__settings = self.__openSettings()
+
+    
+
+        helloMessage = f"""
+███████╗██╗██╗    ██╗  ██╗██╗   ██╗███╗   ██╗████████╗███████╗██████╗ 
+██╔════╝██║██║    ██║  ██║██║   ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗
+█████╗  ██║██║    ███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝
+██╔══╝  ██║██║    ██╔══██║██║   ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗
+██║     ██║██║    ██║  ██║╚██████╔╝██║ ╚████║   ██║   ███████╗██║  ██║ Author: {self.author}
+╚═╝     ╚═╝╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝ Version: {self.version}
+github: {self.github}
+
+Foram encontrados - {len(self.__settings['funds'])} - fundo(s)
+"""
+        self._console.print(helloMessage)        
+        sleep(3)
 
     def __openSettings(self) -> dict:
         try:
