@@ -6,8 +6,8 @@ import pandas as pd
 import requests_cache
 from time import sleep
 from bs4 import BeautifulSoup
-from src.YfScraper import YfScraper
 from rich.console import Console
+from src.YfScraper import YfScraper
 from datetime import datetime, timedelta
 
 
@@ -27,21 +27,20 @@ class FiiHunter:
         }
         self.__settings = self.__openSettings()
 
-    
-
         helloMessage = f"""
-███████╗██╗██╗    ██╗  ██╗██╗   ██╗███╗   ██╗████████╗███████╗██████╗ 
-██╔════╝██║██║    ██║  ██║██║   ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗
-█████╗  ██║██║    ███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝
-██╔══╝  ██║██║    ██╔══██║██║   ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗
-██║     ██║██║    ██║  ██║╚██████╔╝██║ ╚████║   ██║   ███████╗██║  ██║ Author: {self.author}
-╚═╝     ╚═╝╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝ Version: {self.version}
-github: {self.github}
+        ███████╗██╗██╗    ██╗  ██╗██╗   ██╗███╗   ██╗████████╗███████╗██████╗ 
+        ██╔════╝██║██║    ██║  ██║██║   ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗
+        █████╗  ██║██║    ███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝
+        ██╔══╝  ██║██║    ██╔══██║██║   ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗
+        ██║     ██║██║    ██║  ██║╚██████╔╝██║ ╚████║   ██║   ███████╗██║  ██║ Author: {self.author}
+        ╚═╝     ╚═╝╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝ Version: {self.version}
+        github: {self.github}
 
-Foram encontrados - {len(self.__settings['funds'])} - fundo(s)
-"""
+        Foram encontrados - {len(self.__settings['funds'])} - fundo(s)
+        """     
+        os.system(command='cls' if os.name == 'nt' else 'clear')
         self._console.print(helloMessage)        
-        sleep(3)
+        sleep(5)
 
     def __openSettings(self) -> dict:
         try:
