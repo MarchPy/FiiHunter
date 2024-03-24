@@ -64,14 +64,16 @@
   "filter": {
     "Dividend yield (Min)": 12,
     "Volume médio 2m (Min)": 200000,
-    "Quantidade de imóveis (Min)": 1,
+    "Quantidade de imóveis (Min)": 0,
     "P/VP (Min)": 0,
-    "P/VP (Max)": 1.1,
+    "P/VP (Max)": 0.9,
     "VP/Cota > Preço cota": true,
-    "Vacância média (Max)": 5.0
+    "Vacância média (Max)": 5.0,
+    "Volat. Anualizada (Max)": 15.0
   },
 
   "ranking": {
+    "Volat. Anualizada": "Min",
     "Vol $ méd (2m)": "Max",
     "FFO Yield": "Max",
     "Div. Yield": "Max",

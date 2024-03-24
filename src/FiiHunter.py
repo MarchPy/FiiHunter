@@ -140,7 +140,7 @@ class FiiHunter:
 
         os.system(command='cls' if os.name == 'nt' else 'clear')
         if dataNotFound:
-            self._console.print(f'\n[[bold yellow]Unable to collect data from {len(dataNotFound)} ticker(s)[/]] -> {dataNotFound}')
+            self._console.print(f'\n[[bold yellow]Unable to collect data from {len(dataNotFound)} ticker(s)[/]] -> {dataNotFound}\n')
             with open(f'Tickers without data ({self.__date()}).txt', 'w') as fileObj:
                 fileObj.write(str(dataNotFound))
 
@@ -184,6 +184,7 @@ class FiiHunter:
             (dataframe['P/VP'] < self.__settings['filter']['P/VP (Max)']) &
             (dataframe['P/VP'] > self.__settings['filter']['P/VP (Min)']) &
             (dataframe['VP/Cota'] > dataframe['Cotação'] if self.__settings['filter']['VP/Cota > Preço cota'] else None) &
+            (dataframe['Volat. Anualizada'] <= self.__settings['filter']['Volat. Anualizada (Max)']) &
             (dataframe['Vacância média'] < self.__settings['filter']['Vacância média (Max)'])
         )
 
@@ -217,4 +218,4 @@ class FiiHunter:
 
     def displayResult(self, dataframe: pd.DataFrame) -> None:
         self._console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
-        self._console.print(dataframe[['Ativo', 'Nome', 'Segmento', 'Cotação', 'Div. Yield', 'P/VP', 'VP/Cota', 'Dividendo/cota', 'Qtd. Imóveis', 'Qtd. Unidades', 'Vacância média', 'Volat. Anualizada', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
+        self._console.print(dataframe[['Ativo', 'Segmento', 'Cotação', 'VP/Cota', 'Div. Yield', 'P/VP', 'Dividendo/cota', 'Qtd. Imóveis', 'Qtd. Unidades', 'Vacância média', 'Volat. Anualizada', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
