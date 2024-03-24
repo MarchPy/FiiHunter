@@ -69,16 +69,16 @@
     "P/VP (Max)": 0.9,
     "VP/Cota > Preço cota": true,
     "Vacância média (Max)": 5.0,
-    "Volat. Anualizada (Max)": 15.0
+    "Volat. Anualizada (Max)": 30.0
   },
 
   "ranking": {
     "Volat. Anualizada": "Min",
     "Vol $ méd (2m)": "Max",
-    "FFO Yield": "Max",
     "Div. Yield": "Max",
     "P/VP": "Min",
     "Ativos": "Max",
+    "FFO Yield": "Max",
     "FFO/Cota": "Max",
     "Dividendo/cota": "Max",
     "Patrim. Líquido": "Max",
