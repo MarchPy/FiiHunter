@@ -67,8 +67,9 @@
     "Quantidade de imóveis (Min)": 0,
     "P/VP (Min)": 0,
     "P/VP (Max)": 0.9,
-    "VP/Cota > Preço cota": true,
+    "VP/Cota > Cotação": true,
     "Vacância média (Max)": 5.0,
+    "Cap Rate (Min)": 11,
     "Volat. Anualizada (Max)": 30.0
   },
 

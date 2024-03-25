@@ -27,10 +27,11 @@ class FiiHunter:
         }
         self.__settings = self.__openSettings()
 
+    def _helloMessage(self):
         helloMessage = f"""
         ███████╗██╗██╗    ██╗  ██╗██╗   ██╗███╗   ██╗████████╗███████╗██████╗ 
         ██╔════╝██║██║    ██║  ██║██║   ██║████╗  ██║╚══██╔══╝██╔════╝██╔══██╗
-        █████╗  ██║██║    ███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ██████╔╝
+        █████╗  ██║██║    ███████║██║   ██║██╔██╗ ██║   ██║   █████╗  ███████╔╝
         ██╔══╝  ██║██║    ██╔══██║██║   ██║██║╚██╗██║   ██║   ██╔══╝  ██╔══██╗
         ██║     ██║██║    ██║  ██║╚██████╔╝██║ ╚████║   ██║   ███████╗██║  ██║ Author: {self.author}
         ╚═╝     ╚═╝╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚══════╝╚═╝  ╚═╝ Version: {self.version}
@@ -41,7 +42,7 @@ class FiiHunter:
         os.system(command='cls' if os.name == 'nt' else 'clear')
         self._console.print(helloMessage)        
         sleep(5)
-
+    
     def __openSettings(self) -> dict:
         try:
             with open(file='config/settings.json', mode='r', encoding='utf-8') as fileObj:
@@ -50,6 +51,7 @@ class FiiHunter:
 
         except FileNotFoundError:
             self._console.print(f'[{self.__time()}] -> [[italic red]Settings file not found.[/]]')
+            return {}
 
     @staticmethod
     def __time() -> str:
@@ -61,7 +63,6 @@ class FiiHunter:
 
     def fundamentus(self) -> pd.DataFrame:
         data = []
-        dataNotFound = []
         symbols = self.__settings['funds']
 
         idx = 1
@@ -71,18 +72,18 @@ class FiiHunter:
                 self._console.print(f'[{self.__time()}] -> [[italic yellow]Collecting fundamental data for ticker[/]]-[{idx} of {len(symbols)}] :: {symbol} -> ', end='')
 
                 url = f"http://fundamentus.com.br/detalhes.php?papel={symbol}"
-                content = requests.get(url=url, headers=self.__headers)
+                try:
+                    content = requests.get(url=url, headers=self.__headers)
+                    content.raise_for_status()  # Raises an exception for 4xx or 5xx status codes
 
-                if content.status_code == 200:
                     soup = BeautifulSoup(content.content, 'html.parser')
 
                     if soup.find(string='Nenhum papel encontrado') is None:
                         tables = soup.find(name='div', attrs={'class': 'conteudo clearfix'})
                         tables = soup.find_all(name='table', attrs={'class': 'w728'})
 
-                        # --- Proper way to identify the values ---
-
-                        # numTable = 2
+                        # -------- Proper way to identify the values -------- #
+                        # numTable = 4
                         # print("\n\n")
                         # print(f'Contains -{len(tables)}- tables.')
                         # i = 0
@@ -92,8 +93,7 @@ class FiiHunter:
                         #     print('\n')
                         #     i += 1
                         # input("\n\n")
-
-                        # ----------------------------------------------------
+                        # ---------------------------------------------------- #
 
                         # Tabela 0
                         ativo = tables[0].find_all(name='td', attrs={'class': 'data'})[0].text
@@ -106,66 +106,52 @@ class FiiHunter:
 
                         # Tabela 1
                         nTotalCotas = int(tables[1].find_all(name='td', attrs={'class': 'data'})[1].text.replace('.', ''))
-                        relatorio = tables[1].find_all(name='td', attrs={'class': 'data'})[2].find(name='a')
-                        relatorio = relatorio['href'] if relatorio is not None else "-"
+                        relatorio = (lambda x: x['href'] if x is not None else "-")(x=tables[1].find_all(name='td', attrs={'class': 'data'})[2].find(name='a'))
 
                         # Tabela 2
-                        dividendYield = tables[2].find_all(name='td', attrs={'class': 'data'})[4].text
-                        dividendYield = float(dividendYield.replace('%', '').replace('.', '').replace(',', '.')) if dividendYield != '-' else 0
+                        dividendYield = (lambda x: float(x.replace('%', '').replace('.', '').replace(',', '.')) if x != '-' else 0)(x=tables[2].find_all(name='td', attrs={'class': 'data'})[4].text)                        
                         pvp = float(tables[2].find_all(name='td', attrs={'class': 'data'})[7].text.replace(',', '.'))
-                        vpCota = tables[2].find_all(name='td', attrs={'class': 'data'})[8].text
-                        vpCota = float(vpCota.replace('.', '').replace(',', '.')) if vpCota != '-' else 0
-                        dividendoCota = tables[2].find_all(name='td', attrs={'class': 'data'})[5].text
-                        dividendoCota = float(dividendoCota.replace('.', '').replace(',', '.')) if dividendoCota != '-' else 0
-                        ffoCota = tables[2].find_all(name='td', attrs={'class': 'data'})[5].text
-                        ffoCota = float(ffoCota.replace('.', '').replace(',', '.')) if ffoCota != '-' else 0
-                        ffoYield = tables[2].find_all(name='td', attrs={'class': 'data'})[1].text
-                        ffoYield = float(ffoYield.replace('%', '').replace('.', '').replace(',', '.')) if ffoYield != '-' else 0
+                        vpCota = (lambda x: float(x.replace('.', '').replace(',', '.')) if x != '-' else 0)(x=tables[2].find_all(name='td', attrs={'class': 'data'})[8].text)
+                        dividendoCota = (lambda x: float(x.replace('.', '').replace(',', '.')) if x != '-' else 0)(x=tables[2].find_all(name='td', attrs={'class': 'data'})[5].text)
+                        ffoCota = (lambda x: float(x.replace('.', '').replace(',', '.')) if x != '-' else 0)(x=tables[2].find_all(name='td', attrs={'class': 'data'})[5].text)
+                        ffoYield = (lambda x : float(x.replace('%', '').replace('.', '').replace(',', '.')) if x != '-' else 0)(x=tables[2].find_all(name='td', attrs={'class': 'data'})[1].text)                        
                         ativos = int(tables[2].find_all(name='td', attrs={'class': 'data'})[25].text.replace('.', ''))
                         patrimLiq = int(tables[2].find_all(name='td', attrs={'class': 'data'})[26].text.replace('.', ''))
+                        receita3m = (lambda x: int(x.replace('.', '')))(x=tables[2].find_all(name='td', attrs={'class': 'data'})[12].text)
+                        receita12m = (lambda x: int(x.replace('.', '')))(x=tables[2].find_all(name='td', attrs={'class': 'data'})[13].text)
+                        rendDistrib3m = (lambda x: int(x.replace('.', '')))(x=tables[2].find_all(name='td', attrs={'class': 'data'})[21].text)
+                        rendDistrib12m = (lambda x: int(x.replace('.', '')))(x=tables[2].find_all(name='td', attrs={'class': 'data'})[22].text)
 
                         # Tabela 4
                         qtdImoveis = int(tables[4].find_all(name='td', attrs={'class', 'data'})[0].text)
-                        qtdUnidades = tables[4].find_all(name='td', attrs={'class', 'data'})[3].text
-                        qtdUnidades = int(qtdUnidades) if qtdUnidades != '' else 0
+                        qtdUnidades = (lambda x: int(x) if x != '' else 0)(x=tables[4].find_all(name='td', attrs={'class', 'data'})[3].text)                        
                         areaM2 = int(tables[4].find_all(name='td', attrs={'class', 'data'})[1].text.replace('.', ''))
-                        capRate = tables[4].find_all(name='td', attrs={'class', 'data'})[2].text
-                        capRate = float(capRate.replace('.', '').replace(',', '.').replace('%', '')) if capRate != '-' else 0
-                        vacMedia = tables[4].find_all(name='td', attrs={'class', 'data'})[5].text
-                        vacMedia = float(vacMedia.replace('%', '').replace(',', '.')) if vacMedia != '-' else 0
-                        precoM2 = tables[4].find_all(name='td', attrs={'class', 'data'})[7].text
-                        precoM2 = int(precoM2.replace('.', '')) if precoM2 != '-' else 0
+                        capRate = (lambda x: float(x.replace('.', '').replace(',', '.').replace('%', '')) if x != '-' else 0)(x=tables[4].find_all(name='td', attrs={'class', 'data'})[2].text)
+                        vacMedia = (lambda x: float(x.replace('%', '').replace(',', '.')) if x != '-' else 0)(x=tables[4].find_all(name='td', attrs={'class', 'data'})[5].text)
+                        precoM2 = (lambda x: int(x.replace('.', '')) if x != '-' else 0)(x=tables[4].find_all(name='td', attrs={'class', 'data'})[7].text)
 
                         data.append(
                             [
-                                ativo, segmento, nome, preco, precoMinimo52Sem, precoMaximo52Sem, volumeMedio2m, ativos, patrimLiq, nTotalCotas, dividendYield,
-                                dividendoCota, pvp, vpCota, ffoCota, ffoYield, qtdImoveis, qtdUnidades, areaM2, capRate, vacMedia, precoM2,
-                                relatorio
+                                ativo, segmento, nome, preco, precoMinimo52Sem, precoMaximo52Sem, volumeMedio2m, ativos, patrimLiq, receita3m,
+                                rendDistrib3m, receita12m, rendDistrib12m, nTotalCotas, dividendYield, dividendoCota, pvp, vpCota, ffoCota, ffoYield,
+                                qtdImoveis, qtdUnidades, areaM2, capRate, vacMedia, precoM2, relatorio
                             ]
                         )
-
 
                         self._console.print('[[bold green]Data collected successfully[/]]')
 
                     else:
                         self._console.print('[[bold red]Data not found[/]]')
-                        dataNotFound.append(symbol)
 
-                else:
-                    self._console.print(f"Error code: {content.status_code}")
+                except requests.RequestException as e:
+                    self._console.print(f"Error fetching data for {symbol}: {e}")
                     continue
 
                 idx += 1
 
-        os.system(command='cls' if os.name == 'nt' else 'clear')
-        if dataNotFound:
-            self._console.print(f'\n[[bold yellow]Unable to collect data from {len(dataNotFound)} ticker(s)[/]] -> {dataNotFound}\n')
-            with open(f'Tickers without data ({self.__date()}).txt', 'w') as fileObj:
-                fileObj.write(str(dataNotFound))
-
         columns = [
             'Ativo', 'Segmento', 'Nome', 'Cotação', 'Preço 52sem (Min)', 'Preço 52sem (Max)', 'Vol $ méd (2m)', 'Ativos',
-            'Patrim. Líquido', 'N° total de cotas', 'Div. Yield', 'Dividendo/cota', 'P/VP', 'VP/Cota', 'FFO/Cota', 'FFO Yield',
+            'Patrim. Líquido', 'Receita (3m)', 'Rend. Distribuído (3m)', 'Receita (12m)', 'Rend. Distribuído (12m)', 'N° total de cotas', 'Div. Yield', 'Dividendo/cota', 'P/VP', 'VP/Cota', 'FFO/Cota', 'FFO Yield',
             'Qtd. Imóveis', 'Qtd. Unidades', 'Área (m2)', 'Cap Rate', 'Vacância média', 'Preço do m2', 'Relatório'
         ]
         dfFundamentus = pd.DataFrame(data=data, columns=columns)
@@ -181,60 +167,89 @@ class FiiHunter:
         dataframe['Volat. Anualizada'] = 0.0
         for index, row in dataframe.iterrows():
             symbol = row['Ativo']
-            df_yf = YfScraper(symbol=symbol, start_date=start_date, end_date=end_date, interval='1d').collect_data()
-            if not df_yf.empty:
-                df_yf['Retorno Diario'] = df_yf['Close'].ffill().pct_change()
+            try:
+                df_yf = YfScraper(symbol=symbol, start_date=start_date, end_date=end_date, interval='1d').collect_data()
+                if not df_yf.empty:
+                    df_yf['daily_return'] = df_yf['Close'].ffill().pct_change()
+                    desvio_padrao = df_yf['daily_return'].std()
+                    volatilidade_anual = (desvio_padrao * np.sqrt(252)) * 100
 
-                desvio_padrao = df_yf['Retorno Diario'].std()
-                volatilidade_anual = (desvio_padrao * np.sqrt(252)) * 100
+                    dataframe.loc[index, 'Volat. Anualizada'] = float(f'{volatilidade_anual:.2f}')
 
-                dataframe.loc[index, 'Volat. Anualizada'] = float(f'{volatilidade_anual:.2f}')
-            
-            else:
-                dataframe.loc[index, 'Volat. Anualizada'] = 0
+                else:
+                    dataframe.loc[index, 'Volat. Anualizada'] = 0
+
+            except Exception as e:
+                self._console.print(f"Error fetching technical indicators for {symbol}: {e}")
 
         return dataframe
 
     def filter(self, dataframe: pd.DataFrame) -> pd.DataFrame:
-        filter_ = (
-            (dataframe['Div. Yield'] >= self.__settings['filter']['Dividend yield (Min)']) &
-            (dataframe['Vol $ méd (2m)'] > self.__settings['filter']['Volume médio 2m (Min)']) &
-            (dataframe['Qtd. Imóveis'] >= self.__settings['filter']['Quantidade de imóveis (Min)']) &
-            (dataframe['P/VP'] < self.__settings['filter']['P/VP (Max)']) &
-            (dataframe['P/VP'] > self.__settings['filter']['P/VP (Min)']) &
-            (dataframe['VP/Cota'] > dataframe['Cotação'] if self.__settings['filter']['VP/Cota > Preço cota'] else None) &
-            (dataframe['Volat. Anualizada'] <= self.__settings['filter']['Volat. Anualizada (Max)']) &
-            (dataframe['Vacância média'] < self.__settings['filter']['Vacância média (Max)'])
-        )
+        try:
+            condition_1 = dataframe['Div. Yield'] >= self.__settings['filter']['Dividend yield (Min)']
+            condition_2 = dataframe['Vol $ méd (2m)'] > self.__settings['filter']['Volume médio 2m (Min)']
+            condition_3 = dataframe['Qtd. Imóveis'] >= self.__settings['filter']['Quantidade de imóveis (Min)']
+            condition_4 = dataframe['P/VP'] < self.__settings['filter']['P/VP (Max)']
+            condition_5 = dataframe['P/VP'] > self.__settings['filter']['P/VP (Min)']
+            condition_6 = dataframe['Vacância média'] < self.__settings['filter']['Vacância média (Max)']
+            condition_7 = dataframe['Cap Rate'] >= self.__settings['filter']['Cap Rate (Min)']
+            condition_8 = dataframe['Volat. Anualizada'] <= self.__settings['filter']['Volat. Anualizada (Max)']
+            condition_9 = dataframe['VP/Cota'] > dataframe['Cotação'] if self.__settings['filter']['VP/Cota > Cotação'] else dataframe['Ativo'] == dataframe['Ativo']
 
-        return dataframe[filter_]
+            filter_ = (
+                (condition_1) &
+                (condition_2) &
+                (condition_3) &
+                (condition_4) &
+                (condition_5) &
+                (condition_6) &
+                (condition_7) &
+                (condition_8) &
+                (condition_9)
+            )
 
-    def save_file(self, dataframe: pd.DataFrame) -> None:
+            return dataframe[filter_]
+
+        except KeyError as e:
+            self._console.print(f"Error filtering data: {e}")
+            return pd.DataFrame()
+
+    def saveFile(self, dataframe: pd.DataFrame) -> None:
         folder = self.__settings['diretorioResultado']
         try:
-            os.mkdir(path=folder)
+            os.makedirs(folder, exist_ok=True)
 
-        except FileExistsError:
-            pass
+        except OSError as e:
+            self._console.print(f"Error creating directory: {e}")
+            return
 
-        filename = f"FII Results ({self.__date()}).xlsx"
-        dataframe.to_excel(excel_writer=os.path.join(folder, filename), index=False)
-        self._console.print(f'[[bold yellow]Result saved to excel[/]] -> ({os.path.join(folder, filename)})')
+        try:
+            filename = f"FII Results ({self.__date()}).xlsx"
+            dataframe.to_excel(excel_writer=os.path.join(folder, filename), index=False)
+            self._console.print(f'[[bold yellow]Result saved to excel[/]] -> ({os.path.join(folder, filename)})')
+
+        except Exception as e:
+            self._console.print(f"Error saving file: {e}")
 
     def ranking(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         dataframe = dataframe.copy()
         dataframe['Ranking'] = 0
-        for column in self.__settings['ranking']:
-            if self.__settings['ranking'][column] == "Max":
-                index = dataframe[(dataframe[column] == dataframe[column].max())].index.values
-                dataframe.loc[index[0], 'Ranking'] += 1 if len(index) == 1 else 0
+        try:
+            for column in self.__settings['ranking']:
+                if self.__settings['ranking'][column] == "Max":
+                    index = dataframe[(dataframe[column] == dataframe[column].max())].index.values
+                    dataframe.loc[index[0], 'Ranking'] += 1 if len(index) == 1 else 0
 
-            elif self.__settings['ranking'][column] == "Min":
-                index = dataframe[(dataframe[column] == dataframe[column].min())].index.values
-                dataframe.loc[index[0], 'Ranking'] += 1 if len(index) == 1 else 0
+                elif self.__settings['ranking'][column] == "Min":
+                    index = dataframe[(dataframe[column] == dataframe[column].min())].index.values
+                    dataframe.loc[index[0], 'Ranking'] += 1 if len(index) == 1 else 0
+
+        except KeyError as e:
+            self._console.print(f"[[red]Error ranking data[/]]: {e}")
+            exit(code=1)
 
         return dataframe.sort_values(by='Ranking', ascending=False)
 
     def displayResult(self, dataframe: pd.DataFrame) -> None:
         self._console.print(f'\n\n[{self.__time()}] -> [[italic bold green]Resultado final resumido[/]]:')
-        self._console.print(dataframe[['Ativo', 'Segmento', 'Cotação', 'VP/Cota', 'Div. Yield', 'P/VP', 'Dividendo/cota', 'Qtd. Imóveis', 'Qtd. Unidades', 'Vacância média', 'Volat. Anualizada', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
+        self._console.print(dataframe[['Ativo', 'Nome', 'Segmento', 'Cotação', 'VP/Cota', 'Div. Yield', 'P/VP', 'Dividendo/cota', 'Cap Rate', 'Qtd. Imóveis', 'Qtd. Unidades', 'Vacância média', 'Volat. Anualizada', 'Ranking']].to_string(index=False) + "\n" if not dataframe.empty else "[bold red]Nenhuma oportunidade encontrada[/]\n")
